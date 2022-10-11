@@ -75,6 +75,8 @@ jobs:
   container-scan:
     needs: build
     permissions:
+      contents: read
+      packages: write
       security-events: write
     runs-on: ubuntu-latest
     steps:
@@ -106,7 +108,7 @@ jobs:
         run: exit 1
         
   push-to-registry:
-    needs: container-scan
+    needs: [test, container-scan]
     permissions:
       packages: write
     runs-on: ubuntu-latest
