@@ -22,7 +22,7 @@ COPY --from=builder /go/bin/* /usr/local/bin/
 COPY --from=builder /go/grafonnet /
 COPY src /src
 COPY mixin-defs /mixin-defs
-COPY run-mixin.sh /
+COPY run-mixin.sh /run-mixin.sh
 RUN chmod a+x /usr/local/bin/jb /usr/local/bin/jsonnet /run-mixin.sh
 
 ENTRYPOINT ["/run-mixin.sh"]
