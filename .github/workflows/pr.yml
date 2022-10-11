@@ -34,6 +34,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Calculate metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -45,6 +47,7 @@ jobs:
       - name: Build container
         uses: docker/build-push-action@v3
         with:
+          context: ./monitoring-as-code
           file: ./monitoring-as-code/Dockerfile
           push: false
           tags: ${{ steps.meta.outputs.tags }}
@@ -56,6 +59,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Run monitoring mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
@@ -70,6 +75,8 @@ jobs:
       security-events: write
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -100,6 +107,8 @@ jobs:
       packages: write
     runs-on: ubuntu-latest
     steps:         
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.0.0
         with:
