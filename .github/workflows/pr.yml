@@ -32,6 +32,7 @@ jobs:
           sh ${{ github.workspace }}/monitoring-as-code/lint.sh
   
   build:
+    needs: pre-checks
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -57,6 +58,7 @@ jobs:
             MAC_VERSION='#${{ github.event.number }}'
   
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -71,6 +73,7 @@ jobs:
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
   
   container-scan:
+    needs: build
     permissions:
       security-events: write
     runs-on: ubuntu-latest
@@ -103,6 +106,7 @@ jobs:
         run: exit 1
         
   push-to-registry:
+    needs: container-scan
     permissions:
       packages: write
     runs-on: ubuntu-latest
