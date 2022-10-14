@@ -56,11 +56,11 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-      - name: Set color
-        id: random-color-generator
-        run: echo "SELECTED_COLOR=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
-      - name: Get color
-        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
+      - name: Set image tag
+        id: image-tag
+        run: echo "IMAGE_TAG=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+      - name: Get image tag
+        run: echo "Image tag is ${{ steps.image-tag.outputs.IMAGE_TAG }}"
   
   code-test:
     needs: container-image-build
@@ -69,10 +69,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run monitoring mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.image-tag.outputs.IMAGE_TAG }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run testing mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.image-tag.outputs.IMAGE_TAG }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run promtool checks
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
