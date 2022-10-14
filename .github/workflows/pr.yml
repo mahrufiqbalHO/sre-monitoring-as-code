@@ -56,6 +56,11 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
+      - name: Set image
+        id: meta-outputs-labels
+        run: echo "img=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
+      - name: Get image
+        run: echo "image test name is ${{ steps.meta-outputs-labels.img }}"
   
   code-test:
     needs: container-image-build
