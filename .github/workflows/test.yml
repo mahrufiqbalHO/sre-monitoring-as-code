@@ -1,3 +1,16 @@
+name: 'TEST Workflow'
+
+on:
+  pull_request:
+    types: [ labeled, opened, reopened, synchronize ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  PROMTOOL_IMAGE_NAME: sre-promtool
+  PROMTOOL_VERSION: 2.38.0
+  USER: ho-cto
+  
 jobs:
   build:
     runs-on: ubuntu-latest
