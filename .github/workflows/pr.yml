@@ -64,7 +64,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run monitoring mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} sh -c '-m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output'
 
       - name: Run testing mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.meta.outputs.tags }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
