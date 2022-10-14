@@ -60,7 +60,7 @@ jobs:
             MAC_VERSION='#${{ github.event.number }}'
             
       - id: step1
-        run: echo "::set-output name=test::hello-testing"
+        run: echo "::set-output name=test::${{ steps.meta.outputs.tags }}"
   
   code-test:
     needs: container-image-build
