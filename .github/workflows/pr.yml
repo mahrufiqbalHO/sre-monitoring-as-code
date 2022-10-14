@@ -69,10 +69,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run monitoring mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.image-tag.outputs.IMAGE_TAG }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t $GITHUB_OUTPUT -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run testing mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ steps.image-tag.outputs.IMAGE_TAG }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t $GITHUB_OUTPUT -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run promtool checks
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
