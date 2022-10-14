@@ -34,6 +34,8 @@ jobs:
   container-image-build:
     needs: code-quality
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -56,18 +58,19 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-      - name: Set image tag
-        id: image-tag
-        run: echo "IMAGE_TAG=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
-      - name: Get image tag
-        run: echo "Image tag is ${{ steps.image-tag.outputs.IMAGE_TAG }}"
+            
+      - id: step1
+        run: echo "::set-output name=test::hello-testing"
   
   code-test:
     needs: container-image-build
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{needs.container-image-build.outputs.output1}}
+      
       - name: Checkout
         uses: actions/checkout@v3
+      
       - name: Run monitoring mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t $GITHUB_OUTPUT -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
