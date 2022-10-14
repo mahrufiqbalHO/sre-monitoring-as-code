@@ -56,11 +56,11 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-      - name: Set image
-        id: meta-outputs-labels
-        run: echo "img=${{ steps.meta.outputs.tags }}" >> $GITHUB_OUTPUT
-      - name: Get image
-        run: echo "image test name is ${{ steps.meta-outputs-labels.img }}"
+      - name: Set color
+        id: random-color-generator
+        run: echo "SELECTED_COLOR=green" >> $GITHUB_OUTPUT
+      - name: Get color
+        run: echo "The selected color is ${{ steps.random-color-generator.outputs.SELECTED_COLOR }}"
   
   code-test:
     needs: container-image-build
