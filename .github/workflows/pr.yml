@@ -1,4 +1,4 @@
-name: 'PR Workflow'
+name: 'PR NEW Workflow'
 
 on:
   pull_request:
