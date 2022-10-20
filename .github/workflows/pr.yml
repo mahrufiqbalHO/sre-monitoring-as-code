@@ -60,12 +60,12 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-          outputs: type=docker,dest=/tmp/${{ steps.meta.outputs.tags }}.tar
+          outputs: type=docker,dest=/tmp/myimage.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: myimage
-          path: /tmp/${{ steps.meta.outputs.tags }}.tar
+          path: /tmp/myimage.tar
             
       - id: step1
         run: echo "::set-output name=test::${{ steps.meta.outputs.tags }}"
@@ -84,7 +84,7 @@ jobs:
       
       - name: Load Docker image
         run: |
-          docker load --input /tmp/::set-output name=test::${{ steps.meta.outputs.tags }}.tar
+          docker load --input /tmp/myimage.tar
           docker image ls -a
       
       - name: Checkout
