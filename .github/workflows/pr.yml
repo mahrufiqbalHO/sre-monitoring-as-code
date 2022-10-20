@@ -39,6 +39,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Calculate metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -58,12 +60,12 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-          outputs: type=docker,dest=/tmp/myimage.tar
+          outputs: type=docker,dest=/tmp/${{ steps.meta.outputs.tags }}.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: myimage
-          path: /tmp/myimage.tar
+          path: /tmp/${{ steps.meta.outputs.tags }}.tar
             
       - id: step1
         run: echo "::set-output name=test::${{ steps.meta.outputs.tags }}"
@@ -82,7 +84,7 @@ jobs:
       
       - name: Load Docker image
         run: |
-          docker load --input /tmp/myimage.tar
+          docker load --input /tmp/::set-output name=test::${{ steps.meta.outputs.tags }}.tar
           docker image ls -a
       
       - name: Checkout
