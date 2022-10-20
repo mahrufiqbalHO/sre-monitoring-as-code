@@ -6,14 +6,17 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local row = grafana.row;
 
+// MaC imports
+local macConfig = import '../mac-config.libsonnet';
 local dashboardFunctions = import './dashboard-standard-elements.libsonnet';
+local stringFormattingFunctions = import '../util/string-formatting-functions.libsonnet';
 
 // The maximum number of view panels that can be placed in a row (not the same as row panel)
-local viewPanelsPerRow = 8;
+local viewPanelsPerRow = 6;
 
 // The width and height of the view panels
 local viewPanelSize = {
-  x: 3,
+  x: 4,
   y: 4,
 };
 
@@ -24,6 +27,7 @@ local viewPanelSize = {
 // @returns The row panel object
 local createRow(journeyIndex, noOfPanelRows, sliList) =
   local journeyKey = std.objectFields(sliList)[journeyIndex];
+
   [
     row.new(
       title='%(journey)s' % { journey: journeyKey }
@@ -66,14 +70,14 @@ local createView(journeyIndex, sliIndex, noOfPanelRows, config, sliList) =
     {
       gridPos: { x: viewPanelSize.x * (sliIndex % viewPanelsPerRow), y: (journeyIndex + 1) +
                                                                         (noOfPanelRows * viewPanelSize.y) - viewPanelSize.y, w: viewPanelSize.x, h: viewPanelSize.y },
-      title: '%(sliTitle)s (%(period)s)' % { sliTitle: slis[std.objectFields(slis)[0]].key, period: slis[std.objectFields(slis)[0]].slo_period },
-      description: '%(sliDesc)s' % { sliDesc: slis[std.objectFields(slis)[0]].slo_desc },
+      title: '%(sliTitle)s (%(period)s)' % { sliTitle: slis[std.objectFields(slis)[0]].title, period: slis[std.objectFields(slis)[0]].slo_period },
+      description: '%(sliKey)s: %(sliDesc)s' % { sliKey: slis[std.objectFields(slis)[0]].key, sliDesc: slis[std.objectFields(slis)[0]].slo_desc },
       fieldConfig+: {
         defaults+: {
           links: [
             {
               title: 'Full %s Journey SLI dashboard' % journeyKey,
-              url: 'd/%s' % std.join('-', [config.product, journeyKey, 'journey-view?${environment:queryparam}']),
+              url: 'd/%s?${environment:queryparam}' % std.join('-', [macConfig.macDashboardPrefix.uid, config.product, journeyKey]),
             },
           ],
         },
@@ -131,10 +135,10 @@ local createProductDashboard(config, sliList, links) =
   local panels = createPanels(0, 0, 0, config, sliList);
 
   {
-    [std.join('-', [config.product, 'product-view.json'])]:
+    [std.join('-', [macConfig.macDashboardPrefix.uid, config.product]) + '.json']:
       dashboard.new(
-        title='%(product)s-product-view' % { product: config.product },
-        uid=std.join('-', [config.product, 'product-view']),
+        title=stringFormattingFunctions.capitaliseFirstLetters(std.join(' / ', [macConfig.macDashboardPrefix.title, config.product])),
+        uid=std.join('-', [macConfig.macDashboardPrefix.uid, config.product]),
         tags=[config.product, 'mac-version: %s' % config.macVersion, 'product-view'],
         schemaVersion=18,
         editable=true,

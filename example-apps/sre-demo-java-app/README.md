@@ -1,6 +1,6 @@
 # sre-demo-java-app
 
-This project is for use testing custom metrics from a Java application againt the [Monitoring-as-code framework](https://github.com/ho-cto/sre-monitoring-as-code).
+This project is for use testing custom metrics from a Java application against the [Monitoring-as-code framework](https://github.com/ho-cto/sre-monitoring-as-code).
 
 ## How to build
 
@@ -17,10 +17,10 @@ docker build -t sre-demo-java-app .
 Once built, the application can be run using the following command:
 
 ```
-docker run -ti -p 8081:8080 sre-demo-java-app
+docker run -ti -p 4001:4001 sre-demo-java-app
 ```
 
-Navigate to http://localhost:8081 and the application should serve a simple HTML page for testing purposes.
+Navigate to http://localhost:4001/actutor/prometheus and you should be able to see your metrics in a prometheus format.
 
 ## How to integrate with MaC
 
@@ -37,7 +37,7 @@ Navigate to http://localhost:8081 and the application should serve a simple HTML
         "namespace": "localhost"
         },
         "targets": [
-            "host.docker.internal:8081"
+            "host.docker.internal:4001"
         ]
     }
     ]

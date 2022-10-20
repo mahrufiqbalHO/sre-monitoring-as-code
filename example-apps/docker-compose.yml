@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  frontend:
+    image: sre-demo-frontend-app
+    build: ./sre-demo-frontend-app
+    ports: 
+      - 4000:4000
+    restart: on-failure
+    
+  nodejs:
+    profiles: ["nodejs"]
+    image: sre-demo-nodejs-app
+    build: ./sre-demo-nodejs-app
+    ports:
+        - 4001:4001
+    restart: on-failure
+  
+  java:
+    profiles: ["java"]
+    image: sre-demo-java-app
+    build: ./sre-demo-java-app
+    ports:
+        - 4001:4001
+    restart: on-failure
