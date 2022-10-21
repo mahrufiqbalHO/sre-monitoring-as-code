@@ -170,7 +170,8 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          docker image ls -a
+          OUTPUT=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)
+          echo "${OUTPUT}"
           
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.0.0
@@ -180,4 +181,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Push image to GitHub Container Registry
-        run: docker push ${{needs.container-image-build.outputs.output1}}
+        run: docker push ${OUTPUT}
