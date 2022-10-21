@@ -7,7 +7,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  REPO_NAME: ${{ github.event.repository.name }}
   PROMTOOL_IMAGE_NAME: sre-promtool
   PROMTOOL_VERSION: 2.38.0
   USER: ho-cto
@@ -50,6 +49,13 @@ jobs:
           tags: |
             type=raw,value=${{ github.event.pull_request.head.sha }}
 
+      - name: get Repository name
+        run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+  
+      - name: print-name
+      - run: |
+              echo "${{ env.REPO_NAME }}"
+                  
       - name: Build container
         uses: docker/build-push-action@v3
         with:
