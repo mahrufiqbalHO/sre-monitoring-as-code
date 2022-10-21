@@ -35,8 +35,7 @@ jobs:
   container-image-build:
     needs: code-quality
     runs-on: ubuntu-latest
-    outputs:
-      output1: ${{ steps.step1.outputs.test }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -68,15 +67,11 @@ jobs:
         with:
           name: myimage
           path: /tmp/${{ env.REPO_NAME }}.tar
-            
-      - id: step1
-        run: echo "::set-output name=test::${{ steps.meta.outputs.tags }}"
   
   code-test:
     needs: container-image-build
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{needs.container-image-build.outputs.output1}}
       
       - name: Download artifact
         uses: actions/download-artifact@v2
@@ -87,16 +82,16 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          docker image ls -a
+          echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
       
       - name: Checkout
         uses: actions/checkout@v3
       
       - name: Run monitoring mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{needs.container-image-build.outputs.output1}} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_NAME }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run testing mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{needs.container-image-build.outputs.output1}} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_NAME }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run promtool checks
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
@@ -111,8 +106,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
-      - run: echo ${{needs.container-image-build.outputs.output1}}
       
       - name: Download artifact
         uses: actions/download-artifact@v2
@@ -123,7 +116,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          docker image ls -a
+          echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
           
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -138,7 +131,7 @@ jobs:
       - name: Snyk Container Scan
         id: snyk-dockerfile
         run: |
-          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{needs.container-image-build.outputs.output1}}
+          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_NAME }}
         continue-on-error: true
 
       - name: Upload result to GitHub Code Scanning
@@ -158,8 +151,6 @@ jobs:
     steps:         
       - name: Checkout
         uses: actions/checkout@v3
-        
-      - run: echo ${{needs.container-image-build.outputs.output1}}
       
       - name: Download artifact
         uses: actions/download-artifact@v2
