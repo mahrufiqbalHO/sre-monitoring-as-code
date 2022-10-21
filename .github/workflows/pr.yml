@@ -50,7 +50,7 @@ jobs:
             type=raw,value=${{ github.event.pull_request.head.sha }}
 
       - name: get Repository name
-        run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+        run: echo "REPO_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
   
       - name: print-name
         run: |
