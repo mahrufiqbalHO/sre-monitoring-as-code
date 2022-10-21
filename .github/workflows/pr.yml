@@ -53,7 +53,7 @@ jobs:
         run: echo "REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
   
       - name: print-name
-      - run: |
+        run: |
               echo "${{ env.REPO_NAME }}"
                   
       - name: Build container
