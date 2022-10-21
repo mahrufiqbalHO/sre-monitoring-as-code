@@ -111,6 +111,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        
+      - run: echo ${{needs.container-image-build.outputs.output1}}
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: myimage
+          path: /tmp
+      
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/${{ env.REPO_NAME }}.tar
+          docker image ls -a
+          
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -124,7 +138,7 @@ jobs:
       - name: Snyk Container Scan
         id: snyk-dockerfile
         run: |
-          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ steps.meta.outputs.tags }}
+          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{needs.container-image-build.outputs.output1}}
         continue-on-error: true
 
       - name: Upload result to GitHub Code Scanning
@@ -144,6 +158,20 @@ jobs:
     steps:         
       - name: Checkout
         uses: actions/checkout@v3
+        
+      - run: echo ${{needs.container-image-build.outputs.output1}}
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: myimage
+          path: /tmp
+      
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/${{ env.REPO_NAME }}.tar
+          docker image ls -a
+          
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.0.0
         with:
@@ -152,4 +180,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Push image to GitHub Container Registry
-        run: docker push ${{ steps.meta.outputs.tags }}
+        run: docker push ${{needs.container-image-build.outputs.output1}}
