@@ -60,7 +60,7 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-          outputs: type=docker,dest=/tmp/${{ env.REPO_NAME }}.tar
+          outputs: type=docker,name=${{ steps.meta.outputs.tags }}, dest=/tmp/${{ env.REPO_NAME }}.tar
           
       - name: Upload artifact
         uses: actions/upload-artifact@v2
