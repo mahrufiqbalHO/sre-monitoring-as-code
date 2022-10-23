@@ -62,7 +62,7 @@ jobs:
             MAC_VERSION='#${{ github.event.number }}'
      
       - name: Docker Save
-        run: docker images ls
+        run: docker image ls
      
       - name: Upload artifact
         uses: actions/upload-artifact@v2
