@@ -60,12 +60,14 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-          outputs: type=docker,name=${{ steps.meta.outputs.tags }}, dest=/tmp/${{ env.REPO_NAME }}.tar
-          
+     
+      - name: Docker Save
+        run: docker save ${{ steps.meta.outputs.tags }} -o /tmp/${{ env.REPO_NAME }}.tar
+     
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: myimage
+          name: ${{ steps.meta.outputs.tags }}
           path: /tmp/${{ env.REPO_NAME }}.tar
   
   code-test:
