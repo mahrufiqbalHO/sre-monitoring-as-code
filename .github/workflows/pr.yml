@@ -82,16 +82,16 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
       
       - name: Checkout
         uses: actions/checkout@v3
       
       - name: Run monitoring mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_NAME }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_TAG }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run testing mixin
-        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_NAME }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
+        run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_TAG }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
 
       - name: Run promtool checks
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
@@ -116,7 +116,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
           
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -131,7 +131,7 @@ jobs:
       - name: Snyk Container Scan
         id: snyk-dockerfile
         run: |
-          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_NAME }}
+          snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_TAG }}
         continue-on-error: true
 
       - name: Upload result to GitHub Code Scanning
@@ -161,7 +161,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
           
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.0.0
@@ -171,4 +171,4 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
     
       - name: Push image to GitHub Container Registry
-        run: docker push ${{ env.IMAGE_NAME }}
+        run: docker push ${{ env.IMAGE_TAG }}
