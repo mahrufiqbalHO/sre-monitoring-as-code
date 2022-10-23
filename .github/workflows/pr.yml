@@ -73,8 +73,6 @@ jobs:
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
-      - name: Checkout
-        uses: actions/checkout@v3.1.0
       - name: Run monitoring mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_TAG }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
       - name: Run testing mixin
