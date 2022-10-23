@@ -64,6 +64,8 @@ jobs:
     needs: container-image-build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
       - name: Download artifact
         uses: actions/download-artifact@v3.0.1
         with:
@@ -86,8 +88,6 @@ jobs:
       security-events: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3.1.0
       - name: Download artifact
         uses: actions/download-artifact@v3.0.1
         with:
