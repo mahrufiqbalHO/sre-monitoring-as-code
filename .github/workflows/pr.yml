@@ -76,7 +76,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: myimage
+          name: ${{ env.REPO_NAME }}
           path: /tmp
       
       - name: Load Docker image
@@ -110,7 +110,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: myimage
+          name: ${{ env.REPO_NAME }}
           path: /tmp
       
       - name: Load Docker image
@@ -155,7 +155,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: myimage
+          name: ${{ env.REPO_NAME }}
           path: /tmp
       
       - name: Load Docker image
