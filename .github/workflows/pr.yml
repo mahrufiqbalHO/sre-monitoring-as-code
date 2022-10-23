@@ -60,9 +60,7 @@ jobs:
           build-args: |
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
-     
-      - name: Docker Save
-        run: docker image ls
+          outputs: type=docker,dest=/tmp/${{ env.REPO_NAME }}.tar
      
       - name: Upload artifact
         uses: actions/upload-artifact@v2
@@ -84,7 +82,6 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          docker image ls
           echo "IMAGE_NAME=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
       
       - name: Checkout
