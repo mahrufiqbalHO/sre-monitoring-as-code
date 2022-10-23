@@ -18,24 +18,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
       - name: Hadolint Dockerfile
         uses: hadolint/hadolint-action@v2.1.0
         with:
           dockerfile: ./monitoring-as-code/Dockerfile
-
       - name: Jsonnet format check
-        run: |
-          sh ${{ github.workspace }}/monitoring-as-code/fmt.sh && git diff --exit-code --color
-
+        run: sh ${{ github.workspace }}/monitoring-as-code/fmt.sh && git diff --exit-code --color
       - name: Jsonnet lint check
-        run: |
-          sh ${{ github.workspace }}/monitoring-as-code/lint.sh
+        run: sh ${{ github.workspace }}/monitoring-as-code/lint.sh
   
   container-image-build:
     needs: code-quality
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -47,8 +41,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ github.event.pull_request.head.sha }}
-                  
+            type=raw,value=${{ github.event.pull_request.head.sha }}             
       - name: Build container
         uses: docker/build-push-action@v3
         with:
@@ -61,7 +54,6 @@ jobs:
             PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
             MAC_VERSION='#${{ github.event.number }}'
           outputs: type=docker,dest=/tmp/${{ env.REPO_NAME }}.tar
-     
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
@@ -72,73 +64,58 @@ jobs:
     needs: container-image-build
     runs-on: ubuntu-latest
     steps:
-      
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.REPO_NAME }}
           path: /tmp
-      
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
-      
       - name: Checkout
         uses: actions/checkout@v3
-      
       - name: Run monitoring mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_TAG }} -m monitoring -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
-
       - name: Run testing mixin
         run:  docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data -t ${{ env.IMAGE_TAG }} -m testing -rd -i ${{ github.workspace }}/data/mixin-defs -o ${{ github.workspace }}/data/output
-
       - name: Run promtool checks
         run: for FILE in ${{ github.workspace }}/monitoring-as-code/output/prometheus-rules/*-rules.yaml; do docker run -v ${{ github.workspace }}/monitoring-as-code:${{ github.workspace }}/data ${{env.REGISTRY}}/${{env.USER}}/${{env.PROMTOOL_IMAGE_NAME}}:${{env.PROMTOOL_VERSION}} check rules ${{ github.workspace }}/data/output/prometheus-rules/$(basename $FILE); if [ $? -ne 0 ]; then echo "Validation of rules files failed for $(basename $FILE) - exiting"; exit 1; fi done
   
   container-image-test:
     needs: container-image-build
     permissions:
-      contents: read
-      packages: write
       security-events: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.REPO_NAME }}
           path: /tmp
-      
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
-          
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18.10.0
-
       - name: Setup Snyk
         run: |
           npm install snyk -g
           snyk auth ${{secrets.SNYK_TOKEN}}
-      
       - name: Snyk Container Scan
         id: snyk-dockerfile
         run: |
           snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_TAG }}
         continue-on-error: true
-
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
@@ -151,24 +128,20 @@ jobs:
     steps:         
       - name: Checkout
         uses: actions/checkout@v3
-      
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
           name: ${{ env.REPO_NAME }}
           path: /tmp
-      
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
-          
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.0.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-    
       - name: Push image to GitHub Container Registry
         run: docker push ${{ env.IMAGE_TAG }}
