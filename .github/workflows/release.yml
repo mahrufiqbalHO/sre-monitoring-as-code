@@ -30,20 +30,20 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_to_highest: ${{ github.base_ref == 'main' }}      
      
-      - name: Calculate metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=${{steps.calculate.outputs.version}}
-            type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
 
   container-image-build:
     needs: calculate-semver
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{needs.calculate-semver.outputs.version}}
+      - name: Calculate metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{needs.calculate-semver.outputs.version}}
+            type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
   
   tag-semver:
     needs: container-image-build
@@ -52,7 +52,7 @@ jobs:
       - name: Tag repository with SemVer
         uses: UKHomeOffice/semver-tag-action@v3
         with:
-          tag: ${{steps.calculate.outputs.version}}
+          tag: ${{needs.calculate-semver.outputs.version}}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_use_head_tag: ${{ github.base_ref == 'main' }}
 
