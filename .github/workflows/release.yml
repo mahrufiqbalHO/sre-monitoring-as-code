@@ -83,6 +83,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
+          docker image ls
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -132,7 +133,7 @@ jobs:
         run: docker push ${{ env.IMAGE_TAG }}
         
   tag-repo-semver:
-    needs: container-image-test
+    needs: container-image-push
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{needs.container-image-build.outputs.output1}}
