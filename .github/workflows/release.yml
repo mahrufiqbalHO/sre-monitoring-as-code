@@ -7,7 +7,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   REPO_NAME: ${{ github.event.repository.name }}
-  VERSION: ${{ github.event.inputs.foo }}
+  VERSION: ${{ github.event.inputs.version }}
 
 jobs:
   calculate-semver:
@@ -48,8 +48,7 @@ jobs:
           tags: |
             type=raw,value=${{needs.calculate-semver.outputs.version}}
             type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
-        env:
-          VERSION: ${{needs.calculate-semver.outputs.version}}
+      - run: echo "VERSION=${{needs.calculate-semver.outputs.version}}" >> $GITHUB_ENV
       - name: Build container
         uses: docker/build-push-action@v3.2.0
         with:
