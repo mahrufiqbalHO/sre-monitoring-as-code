@@ -84,7 +84,10 @@ jobs:
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
           docker image ls
+          docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code
+          docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -m1 sre-monitoring-as-code
           echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
+          echo ${{ env.IMAGE_TAG }}
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
