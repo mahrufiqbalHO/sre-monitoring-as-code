@@ -8,12 +8,13 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  publish:
-    name: 'Main Publish'
+  calculate-semver:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.labels.*.name, 'skip-release') == false
+      contains(fromJson('["minor", "major", "patch"]'), github.event.pull_request.labels.*.name)
+    outputs:
+      version: ${{steps.calculate.outputs.version}}
     steps:
       - name: Parse the SemVer label
         id: label
@@ -22,18 +23,6 @@ jobs:
           labels: minor,major,patch
           mode: singular
 
-        #Checks-out our repository under $GITHUB_WORKSPACE, so our workflow can access it.
-      - name: Checkout
-        uses: actions/checkout@v3
-
-        #Logs into Github registry
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2.1.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Calculate SemVer value
         id: calculate
         uses: UKHomeOffice/semver-calculate-action@v1
@@ -41,7 +30,7 @@ jobs:
           increment: ${{ steps.label.outputs.matchedLabels }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_to_highest: ${{ github.base_ref == 'main' }}      
-
+     
       - name: Calculate metadata
         id: meta
         uses: docker/metadata-action@v4
@@ -51,18 +40,16 @@ jobs:
             type=raw,value=${{steps.calculate.outputs.version}}
             type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
 
-      - name: Build container
-        uses: docker/build-push-action@v3
-        with:
-          context: ./monitoring-as-code
-          file: ./monitoring-as-code/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            PACKAGE_TOKEN=${{secrets.GITHUB_TOKEN}}
-            MAC_VERSION=${{steps.calculate.outputs.version}}
-
+  container-image-build:
+    needs: calculate-semver
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ${{needs.calculate-semver.outputs.version}}
+  
+  tag-semver:
+    needs: container-image-build
+    runs-on: ubuntu-latest
+    steps:
       - name: Tag repository with SemVer
         uses: UKHomeOffice/semver-tag-action@v3
         with:
@@ -70,6 +57,10 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_use_head_tag: ${{ github.base_ref == 'main' }}
 
+  release-notes:
+    needs: tag-semver
+    runs-on: ubuntu-latest
+    steps:
       - name: Draft release notes
         uses: release-drafter/release-drafter@v5
         env:
