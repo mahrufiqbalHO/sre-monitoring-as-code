@@ -125,7 +125,7 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep sre-monitoring-as-code)" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -m1 sre-monitoring-as-code)" >> $GITHUB_ENV
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.1.0
         with:
