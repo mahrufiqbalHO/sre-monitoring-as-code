@@ -34,6 +34,8 @@ jobs:
   container-image-build:
     needs: calculate-semver
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
     steps:
       - run: echo ${{needs.calculate-semver.outputs.version}}
       - name: Calculate metadata
@@ -44,15 +46,19 @@ jobs:
           tags: |
             type=raw,value=${{needs.calculate-semver.outputs.version}}
             type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
+      - id: step1
+        run: echo "test=${{needs.calculate-semver.outputs.version}}" >> $GITHUB_OUTPUT
+
   
   tag-semver:
     needs: container-image-build
     runs-on: ubuntu-latest
     steps:
+      - run: echo ${{needs.container-image-build.outputs.output1}}
       - name: Tag repository with SemVer
         uses: UKHomeOffice/semver-tag-action@v3
         with:
-          tag: ${{needs.calculate-semver.outputs.version}}
+          tag: ${{needs.container-image-build.outputs.output1}}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_use_head_tag: ${{ github.base_ref == 'main' }}
 
