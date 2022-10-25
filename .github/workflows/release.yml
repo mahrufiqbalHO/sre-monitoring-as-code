@@ -101,12 +101,11 @@ jobs:
         continue-on-error: true
       - name: Dump environment
         run: env
+      - run: echo "/refs/heads/$GITHUB_REF" >> "$GITHUB_ENV"
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-          ref: '${{ ref }}'
-          sha: '${{ sha }}'
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
