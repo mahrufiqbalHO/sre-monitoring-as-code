@@ -10,7 +10,7 @@ jobs:
       - name: Dump environment
         run: env
         
-      - run: echo "GITREF=$('/abc/defg/${{ env.GITHUB_REF }}')" >> $GITHUB_ENV
+      - run: echo "GITREF=/abc/defg/$GITHUB_SHA" >> $GITHUB_ENV
       
       - run: echo "GITSHA=$GITHUB_SHA" >> $GITHUB_ENV
       
