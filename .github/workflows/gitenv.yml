@@ -3,22 +3,20 @@ name: Greeting on variable day
 on: [push,pull_request]
 
 env:
-  DAY_OF_WEEK: Monday
+  VERSION: ${{ git describe --tags --abbrev=0 }}
 
 jobs:
-  greeting_job:
+  job_1:
     runs-on: ubuntu-latest
-    env:
-      Greeting: Hello
     steps:
-      - name: "Say Hello Mona it's Monday"
-        run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
-        env:
-          First_Name: Mona
-      - run: env   
-      - run: echo "DAY_OF_WEEK=Wednesday" >> $GITHUB_ENV
-      - run: echo $DAY_OF_WEEK
       - run: echo "GITHUB_REF=abc/def/$GITHUB_REF" >> $GITHUB_ENV
-      - run: echo $GITHUB_REF
       - run: echo ${{ env.GITHUB_REF }}
-      - run: env 
+      
+      - run: echo "VERSION=9.9.9" >> $GITHUB_ENV
+      - run: echo ${{ env.VERSION }}
+
+  job_2:
+    runs-on: ubuntu-latest
+    needs: job_1
+    steps:
+       - run: echo ${{ env.VERSION }}
