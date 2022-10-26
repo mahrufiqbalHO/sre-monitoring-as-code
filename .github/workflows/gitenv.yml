@@ -21,7 +21,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: job_1
     steps:
-       - run: echo ${{ env.VERSION }}
-       - run: echo ${{ env.VERSION2 }}
-       - run: echo $GITHUB_SHA
-       - run: ${{ $GITHUB_SHA }}
+       - run: ${{ env.GITHUB_SHA }}
+       - run: ${{ env.GITHUB_REF }}
