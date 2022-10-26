@@ -13,8 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true
-    outputs:
-      version: ${{steps.calculate.outputs.version}}
+
     steps:
       - name: Parse the SemVer label
         id: label
