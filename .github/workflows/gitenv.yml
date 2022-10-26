@@ -16,5 +16,5 @@ jobs:
         env:
           First_Name: Mona
         
-      - run: $DAY_OF_WEEK=$GITHUB_SHA
+      - run: DAY_OF_WEEK=$GITHUB_SHA >> $GITHUB_ENV
       - run: echo $DAY_OF_WEEK
