@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event.pull_request.merged == true
-
+    outputs:
+      version: ${{steps.calculate.outputs.version}}
     steps:
       - name: Parse the SemVer label
         id: label
@@ -21,15 +22,14 @@ jobs:
         with:
           labels: minor,major,patch
           mode: singular
-
       - name: Calculate SemVer value
         id: calculate
         uses: UKHomeOffice/semver-calculate-action@v1
         with:
           increment: ${{ steps.label.outputs.matchedLabels }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_to_highest: ${{ github.base_ref == 'main' }}      
-  
+          default_to_highest: ${{ github.base_ref == 'main' }}
+          
   container-image-build:
     needs: calculate-semver
     runs-on: ubuntu-latest
@@ -67,7 +67,6 @@ jobs:
   container-image-test:
     needs: container-image-build
     permissions:
-      contents: read
       security-events: write
     runs-on: ubuntu-latest
     steps:
@@ -131,21 +130,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image to GitHub Container Registry
-        run: docker push ${{ env.IMAGE_TAG }}
+        run: docker push ${{ env.IMAGE_TAG }} 
         
   tag-repo-semver:
     needs: [calculate-semver, container-image-push]
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{needs.container-image-build.outputs.output1}}
       - name: Tag repository with SemVer
         uses: UKHomeOffice/semver-tag-action@v3
         with:
           tag: ${{needs.calculate-semver.outputs.version}}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_use_head_tag: ${{ github.base_ref == 'main' }}
-
-  release-notes:
+          
+  draft-release-notes:
     needs: tag-repo-semver
     runs-on: ubuntu-latest
     steps:
