@@ -3,7 +3,7 @@ name: Greeting on variable day
 on: [push,pull_request]
 
 env:
-  VERSION: ${{ git describe --tags --abbrev=0 }}
+  VERSION: ${{github.ref_name}}
 
 jobs:
   job_1:
