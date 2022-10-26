@@ -7,7 +7,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   REPO_NAME: ${{ github.event.repository.name }}
-  VERSION: ${{ github.event.inputs.version }}
+  GREF: $GITHUB_REF
+  GSHA: $GITHUB_SHA
 
 jobs:
   calculate-semver:
@@ -48,7 +49,6 @@ jobs:
           tags: |
             type=raw,value=${{needs.calculate-semver.outputs.version}}
             type=raw,value=latest,enable=${{ github.base_ref == 'main' }}
-      - run: echo "VERSION=${{needs.calculate-semver.outputs.version}}" >> $GITHUB_ENV
       - name: Build container
         uses: docker/build-push-action@v3.2.0
         with:
@@ -72,7 +72,6 @@ jobs:
     permissions:
       contents: read
       security-events: write
-      actions: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -101,12 +100,14 @@ jobs:
         continue-on-error: true
       - name: Dump environment
         run: env
+      - run: echo $GITHUB_REF
+      - run: echo $GITHUB_SHA
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
           ref: '/refs/heads/$GITHUB_REF'
-          sha: '$GITHUB_SHA'
+          sha: '${{ env.GITHUB_SHA }}'
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
