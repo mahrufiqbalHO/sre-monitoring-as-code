@@ -124,11 +124,6 @@ jobs:
       - name: Load Docker image
         run: |
           docker load --input /tmp/${{ env.REPO_NAME }}.tar
-          docker image ls 
-          docker image ls --format '{{.Repository}}'
-          docker image ls --format '{{.Repository}}' | grep sre-monitoring-as-code
-          docker image ls --format '{{.Repository}}' | grep -m1 sre-monitoring-as-code
-          echo "IMAGE_TAG=$(docker image ls --format '{{.Repository}}' | grep -m1 sre-monitoring-as-code)" >> $GITHUB_ENV
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2.1.0
         with:
@@ -136,7 +131,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image to GitHub Container Registry
-        run: docker push ${{ env.IMAGE_TAG }} 
+        run: |
+           for i in $(docker image list --format '{{.Repository}}:{{.Tag}}' "${1}" | grep "sre-monitoring-as-code"); do
+            docker push "${1}:$i"
+           done 
         
   tag-repo-semver:
     needs: [calculate-semver, container-image-push]
