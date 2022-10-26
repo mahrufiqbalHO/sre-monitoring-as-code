@@ -96,19 +96,14 @@ jobs:
         run: |
           snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_TAG }}
         continue-on-error: true
-        
-      - name: Dump environment
-        run: env
-
       - run: echo "GITHUB_REF=refs/heads/$GITHUB_REF" >> $GITHUB_ENV
-      - run: echo ${{ env.GITHUB_REF }}
-      
+      - run: echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
           ref: ${{ env.GITHUB_REF }}
-          sha: echo $GITHUB_SHA
+          sha: ${{ env.GITHUB_SHA }}
           
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
@@ -141,14 +136,14 @@ jobs:
         run: docker push ${{ env.IMAGE_TAG }}
         
   tag-repo-semver:
-    needs: container-image-push
+    needs: [calculate-semver, container-image-push]
     runs-on: ubuntu-latest
     steps:
       - run: echo ${{needs.container-image-build.outputs.output1}}
       - name: Tag repository with SemVer
         uses: UKHomeOffice/semver-tag-action@v3
         with:
-          tag: ${{ env.VERSION }}
+          tag: ${{needs.calculate-semver.outputs.version}}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           default_use_head_tag: ${{ github.base_ref == 'main' }}
 
