@@ -7,8 +7,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   REPO_NAME: ${{ github.event.repository.name }}
-  GREF: ${{  $GITHUB_REF }}
-  GSHA: echo $GITHUB_SHA
 
 jobs:
   calculate-semver:
