@@ -24,4 +24,4 @@ jobs:
        - run: echo ${{ env.VERSION }}
        - run: echo ${{ env.VERSION2 }}
        - run: echo $GITHUB_SHA
-       - run: $GITHUB_SHA
+       - run: echo ${{ $GITHUB_SHA }}
