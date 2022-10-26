@@ -18,3 +18,5 @@ jobs:
       - run: env   
       - run: echo "DAY_OF_WEEK=Wednesday" >> $GITHUB_ENV
       - run: echo $DAY_OF_WEEK
+      - run: echo "GITHUB_REF=abc/def/master"
+      - run: echo $GITHUB_REF
