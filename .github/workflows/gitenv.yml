@@ -1,0 +1,18 @@
+name: GIT ENV TEST
+
+on: [push,pull_request]
+
+jobs:
+  git-env-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dump environment
+        run: env
+        
+      - run: echo "GITREF=$GITHUB_REF" >> $GITHUB_ENV
+      
+      - run: echo "GITSHA=$GITHUB_SHA" >> $GITHUB_ENV
+      
+      - run: echo ${{ env.GITREF }}
+        
