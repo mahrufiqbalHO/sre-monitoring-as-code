@@ -100,14 +100,15 @@ jobs:
       - name: Dump environment
         run: env
 
-      - run: echo "GITSHA=$GITHUB_SHA" >> $GITHUB_ENV
+      - run: echo "GITHUB_REF=refs/heads/$GITHUB_REF" >> $GITHUB_ENV
+      - run: echo ${{ env.GITHUB_REF }}
       
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-          ref: 'refs/heads/main'
-          sha: '${{ env.GITSHA }}'
+          ref: ${{ env.GITHUB_REF }}
+          sha: $GITHUB_SHA
           
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
