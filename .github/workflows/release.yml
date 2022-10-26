@@ -12,7 +12,7 @@ jobs:
   calculate-semver:
     runs-on: ubuntu-latest
     if: |
-      github.event.pull_request.merged == true
+      github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, fromJson('["minor", "major", "patch"]'))
     outputs:
       version: ${{steps.calculate.outputs.version}}
     steps:
