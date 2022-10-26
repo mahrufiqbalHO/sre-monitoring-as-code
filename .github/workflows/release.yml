@@ -7,8 +7,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   REPO_NAME: ${{ github.event.repository.name }}
-  GREF: $GITHUB_REF
-  GSHA: $GITHUB_SHA
+  GREF: ${{  $GITHUB_REF }}
+  GSHA: echo $GITHUB_SHA
 
 jobs:
   calculate-semver:
@@ -98,16 +98,19 @@ jobs:
         run: |
           snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_TAG }}
         continue-on-error: true
+        
       - name: Dump environment
         run: env
-      - run: echo $GITHUB_REF
-      - run: echo $GITHUB_SHA
+
+      - run: echo "GITSHA=$GITHUB_SHA" >> $GITHUB_ENV
+      
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-          ref: '/refs/heads/$GITHUB_REF'
-          sha: '${{ env.GITHUB_SHA }}'
+          ref: 'refs/heads/main'
+          sha: '${{ env.GITSHA }}'
+          
       - name: Check on failures
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
