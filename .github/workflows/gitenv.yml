@@ -13,6 +13,7 @@ jobs:
       - run: echo ${{ env.GITHUB_REF }}
       
       - run: echo "VERSION=9.9.9" >> $GITHUB_ENV
+      - run: echo "VERSION2=9.1.1" >> $GITHUB_ENV
       - run: echo ${{ env.VERSION }}
 
   job_2:
@@ -20,3 +21,4 @@ jobs:
     needs: job_1
     steps:
        - run: echo ${{ env.VERSION }}
+       - run: echo ${{ env.VERSION2 }}
