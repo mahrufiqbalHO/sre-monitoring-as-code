@@ -133,7 +133,8 @@ jobs:
       - name: Push image to GitHub Container Registry
         run: |
            for i in $(docker image list --format '{{.Repository}}:{{.Tag}}' "${1}" | grep "sre-monitoring-as-code"); do
-            docker push "${1}:$i"
+            echo "${1}$i"
+            docker push "${1}$i"
            done 
         
   tag-repo-semver:
