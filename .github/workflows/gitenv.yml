@@ -1,19 +1,20 @@
-name: GIT ENV TEST
+name: Greeting on variable day
 
 on: [push,pull_request]
 
-jobs:
-  git-env-test:
-    runs-on: ubuntu-latest
+env:
+  DAY_OF_WEEK: Monday
 
+jobs:
+  greeting_job:
+    runs-on: ubuntu-latest
+    env:
+      Greeting: Hello
     steps:
-      - name: Dump environment
-        run: env
+      - name: "Say Hello Mona it's Monday"
+        run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+        env:
+          First_Name: Mona
         
-      - run: echo "GITREF=/abc/defg/$GITHUB_SHA" >> $GITHUB_ENV
-      
-      - run: echo "GITSHA=$GITHUB_SHA" >> $GITHUB_ENV
-      
-      - run: echo ${{ env.GITREF }}
-      - run: echo ${{ env.GITSHA }}
-        
+      - run: $DAY_OF_WEEK=$('Tuesday')
+      - run: echo $DAY_OF_WEEK
