@@ -101,7 +101,13 @@ jobs:
         continue-on-error: true
       - name: Dump environment
         run: env
-      - run: echo "/refs/heads/$GITHUB_REF" >> "$GITHUB_ENV"
+      - name: Update GITHUB_REF
+        run: |
+              if [[ ! "$GITHUB_REF" =~ ^\/refs\/heads\/.*$ ]]; then
+               echo "/refs/heads/$GITHUB_REF" >> "$GITHUB_ENV"
+              fi
+      - name: Check GITHUB_REF
+        run: echo "$GITHUB_REF"
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
