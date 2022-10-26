@@ -97,7 +97,7 @@ jobs:
           snyk container test --file=./monitoring-as-code/Dockerfile --sarif-file-output=snyk.sarif --app-vulns --severity-threshold=medium ${{ env.IMAGE_TAG }}
         continue-on-error: true
       - name: Set env reference
-        run: echo "GITHUB_REF=refs/heads/$GITHUB_REF" >> $GITHUB_ENV && "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
+        run: echo "GITHUB_REF=refs/heads/$GITHUB_REF" >> $GITHUB_ENV && echo "GITHUB_SHA=$GITHUB_SHA" >> $GITHUB_ENV
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
