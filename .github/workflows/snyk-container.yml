@@ -2,7 +2,7 @@ name: 'SNYK SCHEDULER'
 
 on:
   schedule:
-   - cron: '01 * * * *'
+   - cron: '* * * * *'
 
 env:
   REGISTRY: ghcr.io
