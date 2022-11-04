@@ -1,4 +1,4 @@
-name: 'SNYK SCHEDULER'
+name: 'MAIN SCHEDULER'
 
 on:
   push:
@@ -91,9 +91,9 @@ jobs:
       - name: Post failure to Slack channel
         id: slack
         uses: slackapi/slack-github-action@v1.23.0
-        if: ${{ failure() }}
+        if: success() || failure()
         with:
           channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-message: "GitHub Action failure: ${{github.repository}}\nRun: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}\nOriginating PR: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+          slack-message: "GitHub Action failure: ${{github.repository}}\n Run: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
