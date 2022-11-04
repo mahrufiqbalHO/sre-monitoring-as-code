@@ -1,4 +1,4 @@
-name: 'MAIN SCHEDULER'
+name: 'Main Scheduler'
 
 on:
   push:
