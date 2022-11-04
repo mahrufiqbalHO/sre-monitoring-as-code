@@ -16,36 +16,23 @@ jobs:
           {
             "blocks": [
               {
-                "type": "divider"
-              },
-              {
-                "type": "section",
+                "type": "header",
                 "text": {
-                  "type": "mrkdwn",
-                  "text": "\n:alert::alert::alert::alert:\n\n*GitHub Action Failure:* ${{github.repository}} \n\n Main scheduler workflow has failed!"
-                },
-                "accessory": {
-                  "type": "image",
-                  "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
-                  "alt_text": "failed workflow"
+                  "type": "plain_text",
+                  "text": ":alert: GitHub Action Failure :alert:",
+                  "emoji": true
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "Click on the Run button to view the failed workflow."
+                  "text": "${{github.repository}} >> \n\nMain scheduler workflow has failed!\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
                 },
                 "accessory": {
-                  "type": "button",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "Run",
-                    "emoji": true
-                  },
-                  "value": "Run",
-                  "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}",
-                  "action_id": "button-action"
+                  "type": "image",
+                  "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
+                  "alt_text": "cute cat"
                 }
               }
             ]
