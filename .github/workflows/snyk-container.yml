@@ -88,12 +88,35 @@ jobs:
     needs: container-image-test
     runs-on: ubuntu-latest
     steps:
-      - name: Post failure to Slack channel
-        id: slack
-        uses: slackapi/slack-github-action@v1.23.0
-        if: success() || failure()
-        with:
-          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-          slack-message: "GitHub Action failure: ${{github.repository}}\n Run: ${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}"
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    - name: Post to a Slack channel
+      id: slack
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+        payload: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": ":alert: GitHub Action Failure: ${{github.repository}} :alert:",
+                  "emoji": true
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
+                },
+                "accessory": {
+                  "type": "image",
+                  "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
+                  "alt_text": "cute cat"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
