@@ -19,7 +19,7 @@ jobs:
                 "type": "header",
                 "text": {
                   "type": "plain_text",
-                  "text": ":alert: GitHub Action Failure :alert:",
+                  "text": ":alert: GitHub Action Failure: ${{github.repository}} :alert:",
                   "emoji": true
                 }
               },
@@ -27,7 +27,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "${{github.repository}} >> \n\nMain scheduler workflow has failed!\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
+                  "text": "Main scheduler workflow has failed!\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
                 },
                 "accessory": {
                   "type": "image",
