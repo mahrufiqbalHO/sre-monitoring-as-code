@@ -22,12 +22,12 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "*Ler Ros*\n:star::star::star::star: 2082 reviews\n I would really recommend the  Yum Koh Moo Yang - Spicy lime dressing and roasted quick marinated pork shoulder, basil leaves, chili & rice powder."
+                  "text": "\n:alert::alert::alert::alert:\n\n*GitHub Action Failure:*\n\n Main scheduler workflow has failed!"
                 },
                 "accessory": {
                   "type": "image",
-                  "image_url": "https://s3-media2.fl.yelpcdn.com/bphoto/DawwNigKJ2ckPeDeDM7jAg/o.jpg",
-                  "alt_text": "alt text for image"
+                  "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
+                  "alt_text": "failed workflow"
                 }
               },
               {
@@ -40,30 +40,11 @@ jobs:
                     "type": "button",
                     "text": {
                       "type": "plain_text",
-                      "text": "Farmhouse",
+                      "text": "Run",
                       "emoji": true
                     },
-                    "value": "click_me_123"
-                  },
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Kin Khao",
-                      "emoji": true
-                    },
-                    "value": "click_me_123",
-                    "url": "https://google.com"
-                  },
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Ler Ros",
-                      "emoji": true
-                    },
-                    "value": "click_me_123",
-                    "url": "https://google.com"
+                    "value": "Run",
+                    "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}"
                   }
                 ]
               }
