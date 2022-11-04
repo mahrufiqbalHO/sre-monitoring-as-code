@@ -22,7 +22,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "\n:alert::alert::alert::alert:\n\n*GitHub Action Failure:*\n\n Main scheduler workflow has failed!"
+                  "text": "\n:alert::alert::alert::alert:\n\n*GitHub Action Failure:* ${{github.repository}} \n\n Main scheduler workflow has failed!"
                 },
                 "accessory": {
                   "type": "image",
@@ -31,22 +31,22 @@ jobs:
                 }
               },
               {
-                "type": "divider"
-              },
-              {
-                "type": "actions",
-                "elements": [
-                  {
-                    "type": "button",
-                    "text": {
-                      "type": "plain_text",
-                      "text": "Run",
-                      "emoji": true
-                    },
-                    "value": "Run",
-                    "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}"
-                  }
-                ]
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Click on the Run button to view the failed workflow."
+                },
+                "accessory": {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Run",
+                    "emoji": true
+                  },
+                  "value": "Run",
+                  "url": "${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}",
+                  "action_id": "button-action"
+                }
               }
             ]
           }
