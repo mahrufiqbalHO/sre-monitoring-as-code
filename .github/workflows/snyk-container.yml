@@ -1,4 +1,4 @@
-name: 'Scheduler Testing'
+name: 'Scheduler Main Testing'
 
 on:
   push:
