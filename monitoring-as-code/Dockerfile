@@ -27,37 +27,6 @@ RUN curl -LO ${CURL_OPTIONS} \
     yum -y install wget-1.14-10.el7.x86_64.rpm && \
     rm *.rpm
 
-# wget - command line utility (manual install)
-#
-# https://www.cvedetails.com/cve/CVE-2014-4877/
-#
-RUN curl -LO ${CURL_OPTIONS} \
-      http://www.mirrorservice.org/sites/ftp.gnu.org/gnu/wget/wget-1.15.tar.gz && \
-    tar zxf wget-1.15.tar.gz && \
-    cd wget-1.15 && \
-    ./configure --prefix=/opt/wget && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf wget-1.15 && \
-    rm *.tar.gz
-
-# p7zip - command line utility (manual install)
-#
-# https://www.cvedetails.com/cve/CVE-2015-1038/
-#
-RUN curl -LO ${CURL_OPTIONS} \
-      https://sourceforge.net/projects/p7zip/files/p7zip/9.20.1/p7zip_9.20.1_src_all.tar.bz2 && \
-    bzcat p7zip_9.20.1_src_all.tar.bz2 | tar x && \
-    cd p7zip_9.20.1 && \
-    cp install.sh install.sh.orig && \
-    cat install.sh.orig | sed -e 's|DEST_HOME=/usr/local|DEST_HOME=/opt/p7zip|g' > install.sh && \
-    make && \
-    ./install.sh && \
-    cd - && \
-    rm -rf p7zip_9.20.1 && \
-    rm *.tar.bz2
-
 
 # Precautionary failure with messages
 #
