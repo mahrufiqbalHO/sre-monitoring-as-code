@@ -81,6 +81,7 @@ jobs:
         with:
           sarif_file: snyk.sarif
       - name: Check on failures
+        id: snyk-status
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
 
@@ -91,7 +92,7 @@ jobs:
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: ${{ failure() }}
+      if: failure() && steps.snyk-status.outcome != 'success'
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
