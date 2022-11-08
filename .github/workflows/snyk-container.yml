@@ -1,6 +1,9 @@
 name: 'Scheduler Testing'
 
 on:
+  push:
+    branches:
+      - main
   schedule:
    - cron: '0 0,6,12,18 * * *'
 
