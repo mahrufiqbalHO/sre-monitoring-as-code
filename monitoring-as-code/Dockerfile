@@ -178,14 +178,6 @@ RUN curl -LO ${CURL_OPTIONS} \
     rm -rf bash-4.3 && \
     rm -rf *.tar.gz
 
-# rpmsquirt
-#
-RUN touch /var/lib/rpm/* && \
-    yum -y install rpm-build redhat-rpm-config rpmdevtools
-COPY rpmsquirt.sh /rpmsquirt.sh
-COPY rpmsquirt.dat /
-RUN /rpmsquirt.sh 
-
 # Precautionary failure with messages
 #
 CMD echo 'Vulnerable image' && /bin/false
