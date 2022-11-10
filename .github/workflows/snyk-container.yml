@@ -116,7 +116,8 @@ jobs:
                   "alt_text": "cute cat"
                 }
               }
-            ]
+            ],
+            text="Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
           }
       env:
         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
