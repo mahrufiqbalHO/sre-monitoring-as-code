@@ -81,10 +81,11 @@ jobs:
         with:
           sarif_file: snyk.sarif
       - name: Check on failures
+        continue-on-error: true
         id: snyk-status
         if: steps.snyk-dockerfile.outcome != 'success'
         run: exit 1
-
+        
   notify-alerts:
     needs: container-image-test
     runs-on: ubuntu-latest
