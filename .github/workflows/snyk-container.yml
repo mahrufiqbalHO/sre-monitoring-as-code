@@ -82,27 +82,17 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-      - name: Check on failures
-        continue-on-error: true
-        id: snyk-status
-        if: steps.snyk-dockerfile.outcome != 'success'
-        run: exit 1
         
   notify-alerts:
     needs: container-image-test
     runs-on: ubuntu-latest
     steps:
-    - name: Test1
+    - name: Outcome
       run: echo ${{needs.container-image-test.outputs.outcome}}
-    - name: Test2
-      run: echo ${{steps.snyk-dockerfile.outcome}}
-    - name: Test3
-      if: ${{needs.container-image-test.outputs.outcome}}  != 'success'
-      run: echo "Bye"
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: ${{ failure() }}
+      if: ${{needs.container-image-test.outputs.outcome}}  != 'success'
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
