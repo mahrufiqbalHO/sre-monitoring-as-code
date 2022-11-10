@@ -98,7 +98,7 @@ jobs:
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: failure() && steps.snyk-status.outcome != 'success'
+      if: failure()
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
