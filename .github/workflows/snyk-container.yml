@@ -90,8 +90,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Test
-      if: steps.snyk-dockerfile.outcome != 'success'
       run: echo "Hello"
+    - name: Test2
+      if: steps.snyk-dockerfile.outcome != 'success'
+      run: echo "Bye"
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
