@@ -50,6 +50,8 @@ jobs:
     permissions:
       security-events: write
     runs-on: ubuntu-latest
+    outputs:
+      outcome: ${{steps.snyk-dockerfile.outcome}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
@@ -91,9 +93,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Test
-      run: echo "Hello"
+      run: echo ${{needs.container-image-test.outputs.outcome}}
     - name: Test2
-      if: steps.snyk-dockerfile.outcome != 'success'
+      if: ${{needs.container-image-test.outputs.outcome}}  != 'success'
       run: echo "Bye"
     - name: Post to a Slack channel
       id: slack
