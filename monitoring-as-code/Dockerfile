@@ -15,5 +15,5 @@ RUN yum -y install deltarpm && yum -y update
 # Install build utils
 #
 RUN touch /var/lib/rpm/* && \
-    yum -y install bison gnutls-devel gcc libidn-devel gcc-c++ bzip2 && \
+    yum -y install bison && \
     yum clean all
