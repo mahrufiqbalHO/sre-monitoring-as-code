@@ -86,13 +86,11 @@ jobs:
   notify-alerts:
     needs: container-image-test
     runs-on: ubuntu-latest
+    if: ${{ needs.container-image-test.outputs.outcome !='success' }}
     steps:
-    - name: Outcome
-      run: echo ${{needs.container-image-test.outputs.outcome}}
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: ${{ needs.container-image-test.outputs.outcome !='success' }}
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
