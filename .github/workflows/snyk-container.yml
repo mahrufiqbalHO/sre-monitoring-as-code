@@ -89,16 +89,10 @@ jobs:
     steps:
     - name: Outcome
       run: echo ${{needs.container-image-test.outputs.outcome}}
-    - name: test1
-      if: ${{'needs.container-image-test.outputs.outcome' !='success' }}
-      run: echo "test1"
-    - name: test2
-      if: ${{needs.container-image-test.outputs.outcome !='success' }}
-      run: echo "test2"
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: ${{ failure() && needs.container-image-test.outputs.outcome == 'failure' }}
+      if: ${{ needs.container-image-test.outputs.outcome !='success' }}
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
