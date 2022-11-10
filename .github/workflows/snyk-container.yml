@@ -95,6 +95,7 @@ jobs:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
           {
+            "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>",
             "blocks": [
               {
                 "type": "header",
