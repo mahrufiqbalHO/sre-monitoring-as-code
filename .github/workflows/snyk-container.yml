@@ -92,15 +92,17 @@ jobs:
     needs: container-image-test
     runs-on: ubuntu-latest
     steps:
-    - name: Test
+    - name: Test1
       run: echo ${{needs.container-image-test.outputs.outcome}}
     - name: Test2
+      run: echo ${{steps.snyk-dockerfile.outcome}}
+    - name: Test3
       if: ${{needs.container-image-test.outputs.outcome}}  != 'success'
       run: echo "Bye"
     - name: Post to a Slack channel
       id: slack
       uses: slackapi/slack-github-action@v1.23.0
-      if: failure()
+      if: ${{ failure() }}
       with:
         channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
         payload: |
