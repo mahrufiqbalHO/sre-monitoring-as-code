@@ -1,4 +1,4 @@
-name: 'Scheduler Main Testing'
+name: 'Main'
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ github.sha }}            
+            type=raw,value=${{ github.sha }}
       - name: Build container
         uses: docker/build-push-action@v3.2.0
         with:
@@ -44,7 +44,7 @@ jobs:
         with:
           name: ${{ env.REPO_NAME }}
           path: /tmp/${{ env.REPO_NAME }}.tar
-  
+
   container-image-test:
     needs: container-image-build
     permissions:
@@ -82,42 +82,42 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-        
+
   notify-alerts:
     needs: container-image-test
     runs-on: ubuntu-latest
     if: ${{ needs.container-image-test.outputs.outcome !='success' }}
     steps:
-    - name: Post to a Slack channel
-      id: slack
-      uses: slackapi/slack-github-action@v1.23.0
-      with:
-        channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
-        payload: |
-          {
-            "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>",
-            "blocks": [
-              {
-                "type": "header",
-                "text": {
-                  "type": "plain_text",
-                  "text": ":alert: GitHub Action Failure: ${{github.repository}} :alert:",
-                  "emoji": true
-                }
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
+      - name: Post to a Slack channel
+        id: slack
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          payload: |
+            {
+              "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":warning: GitHub Workflow Failure: ${{github.repository}} :warning:",
+                    "emoji": true
+                  }
                 },
-                "accessory": {
-                  "type": "image",
-                  "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
-                  "alt_text": "cute cat"
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Main scheduler workflow has failed!\n\n\n\n\n <${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}}|View Workflow>"
+                  },
+                  "accessory": {
+                    "type": "image",
+                    "image_url": "https://ca.slack-edge.com/T03TJ3P61-U034J2897V0-1d3e4b813a11-72",
+                    "alt_text": "cute cat"
+                  }
                 }
-              }
-            ]
-          }
-      env:
-        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
