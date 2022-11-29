@@ -1,0 +1,23 @@
+name: 'TEST Workflow'
+
+on:
+  push:
+    branches:
+      - main
+  
+jobs:
+  user-totals-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Retrieve user totals report
+        uses: nicklegan/github-enterprise-user-totals-report-action@v1.0.0
+        with:
+          token: ${{ secrets.ENT_TOKEN }}
+        # enterprise: ''
+        # sort: 'login'
+        # sort-order: 'asc'
+        # json: 'false'
